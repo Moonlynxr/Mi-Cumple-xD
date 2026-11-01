@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B2559">
+<title>La lotería del cumpleaños de Alan</title>
+<meta property="og:title" content="La lotería de mi cumpleaños">
+<meta property="og:description" content="Nueve cartas, nueve datos de la fiesta. Márcalas y confirma tu lugar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bevan&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --anil: #1B2559;
+    --hueso: #F5E8CB;
+    --tinta: #1A1630;
+    --rojo: #C92F23;
+    --amarillo: #F2B33D;
+    --rosa: #C71A6C;
+    --verde: #1F8A5B;
+    --turquesa: #12877F;
+    --display: "Bevan", Georgia, serif;
+    --texto: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    min-height: 100vh;
+    background: var(--anil);
+    color: var(--hueso);
+    font-family: var(--texto);
+    font-size: 17px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    opacity: .16; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .picado { display: block; width: 100%; height: 58px; }
+  main { width: 100%; max-width: 640px; margin: 0 auto; padding: 28px 16px 56px; }
+  h1 {
+    font-family: var(--display); font-weight: 400;
+    font-size: clamp(32px, 9vw, 54px); line-height: 1.04;
+    text-align: center; text-wrap: balance; color: var(--hueso);
+    text-shadow: 3px 3px 0 var(--rosa);
+  }
+  .intro { max-width: 46ch; margin: 18px auto 0; text-align: center; text-wrap: pretty; color: #D8D9EE; }
+  .carta {
+    --c: var(--rojo); position: relative; display: flex; flex-direction: column;
+    aspect-ratio: 2 / 3.15; background: var(--hueso); color: var(--tinta);
+    border: 5px solid var(--c); border-radius: 12px;
+    box-shadow: 3px 4px 0 rgba(8, 10, 36, .6); padding: 0; text-align: center; font: inherit;
+  }
+  button.carta { cursor: pointer; transition: transform .15s ease; -webkit-tap-highlight-color: transparent; }
+  .num {
+    position: absolute; top: 4px; left: 4px; z-index: 2;
+    min-width: 24px; height: 24px; padding: 0 6px; display: grid; place-items: center;
+    border-radius: 12px; background: var(--c); color: var(--hueso);
+    font-family: var(--display); font-size: 12px; line-height: 1;
+  }
+  .arte { flex: 1; min-height: 0; display: grid; place-items: center; padding: 20px 10px 0; }
+  .arte svg { width: 100%; height: 100%; max-height: 100%; overflow: visible; }
+  .arte svg * { stroke: var(--tinta); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+  .arte svg .n  { fill: none; }
+  .arte svg .ns { stroke: none; }
+  .arte svg .fr  { fill: var(--rojo); }
+  .arte svg .fa  { fill: var(--amarillo); }
+  .arte svg .fro { fill: var(--rosa); }
+  .arte svg .fv  { fill: var(--verde); }
+  .arte svg .ft  { fill: var(--turquesa); }
+  .arte svg .fb  { fill: #FFFAF0; }
+  .arte svg .fi  { fill: var(--tinta); }
+  .pie { padding: 4px 4px 8px; }
+  .nombre { display: block; font-family: var(--display); font-size: clamp(11.5px, 3.3vw, 17px); line-height: 1.05; }
+  .dato { display: block; margin-top: 3px; font-size: clamp(10.5px, 2.9vw, 13.5px); line-height: 1.15; font-weight: 600; color: #4A4460; }
+  .mesa { display: grid; place-items: center; margin: 34px 0 40px; }
+  .grande { width: min(68vw, 290px); --c: var(--rosa); rotate: -2deg; animation: reparte .9s cubic-bezier(.2, .9, .3, 1.1) .15s both; }
+  .grande .num { min-width: 40px; height: 40px; border-radius: 20px; font-size: 20px; top: 6px; left: 6px; }
+  .grande .arte { padding: 26px 18px 0; }
+  .grande .nombre { font-size: 26px; }
+  .grande .dato { font-family: var(--display); font-weight: 400; font-size: 20px; color: var(--rosa); margin-top: 2px; }
+  @keyframes reparte {
+    from { opacity: 0; transform: translateY(-70px) rotate(-14deg) scale(.9); }
+    to   { opacity: 1; transform: none; }
+  }
+  .tabla { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 2.6vw, 16px); max-width: 600px; margin: 0 auto; }
+  .tabla .carta:nth-child(3n+1) { rotate: -1deg; }
+  .tabla .carta:nth-child(3n+2) { rotate: .6deg; }
+  .tabla .carta:nth-child(3n)   { rotate: -.4deg; }
+  @media (hover: hover) { button.carta:hover { transform: translateY(-4px); } }
+  button.carta:focus-visible { outline: 4px solid var(--amarillo); outline-offset: 3px; }
+  .sol {
+    margin: 22px 8px 4px; padding: 0; border-radius: 8px;
+    background: repeating-conic-gradient(from 0deg at 50% 60%, var(--amarillo) 0 8deg, #F7CF6E 8deg 16deg);
+    border: 3px solid var(--tinta);
+  }
+  .sol b {
+    font-family: var(--display); font-weight: 400; font-size: clamp(30px, 10vw, 54px); line-height: 1;
+    color: var(--tinta); -webkit-text-stroke: 6px var(--hueso); paint-order: stroke fill;
+  }
+  .frijol {
+    position: absolute; z-index: 3; pointer-events: none; left: var(--x); top: var(--y);
+    width: 28%; aspect-ratio: 1.55 / 1; border-radius: 50%;
+    background: radial-gradient(ellipse at 34% 28%, #B27744, #5C351A 68%);
+    box-shadow: 1px 2px 0 rgba(0, 0, 0, .45); transform: rotate(var(--r));
+    animation: cae .45s cubic-bezier(.3, 1.6, .5, 1) both;
+  }
+  .frijol.sale { animation: sale .2s forwards; }
+  @keyframes cae {
+    from { opacity: 0; transform: translateY(-46px) scale(1.8) rotate(var(--r)); }
+    to   { opacity: 1; transform: translateY(0) scale(1) rotate(var(--r)); }
+  }
+  @keyframes sale { to { opacity: 0; transform: scale(.6) rotate(var(--r)); } }
+  .progreso { margin: 22px 0 36px; text-align: center; font-weight: 700; color: var(--amarillo); }
+  .tapete {
+    background: var(--rojo); border: 4px solid var(--hueso); border-radius: 14px;
+    box-shadow: 5px 6px 0 rgba(8, 10, 36, .6); padding: 26px 22px 24px; text-align: center;
+  }
+  .tapete h2 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 7vw, 34px); line-height: 1.1; }
+  .tapete .cuando { margin-top: 14px; font-size: 20px; font-weight: 800; }
+  .tapete address { margin-top: 2px; font-style: normal; font-weight: 500; }
+  .mapa-embed {
+    margin-top: 16px; border-radius: 10px; overflow: hidden;
+    border: 3px solid var(--tinta); box-shadow: 3px 4px 0 rgba(8,10,36,.5);
+  }
+  .mapa-embed iframe { width: 100%; height: 220px; border: 0; display: block; }
+  .botones { display: flex; flex-direction: column; gap: 12px; margin-top: 22px; }
+  @media (min-width: 520px) { .botones { flex-direction: row; } .botones .btn { flex: 1; } }
+  a.btn {
+    display: block; padding: 14px 18px; border: 3px solid var(--tinta); border-radius: 10px;
+    box-shadow: 4px 4px 0 var(--tinta); color: var(--tinta); font-weight: 800;
+    text-decoration: none; text-align: center; transition: transform .1s, box-shadow .1s;
+  }
+  a.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--tinta); }
+  a.btn:focus-visible { outline: 4px solid var(--amarillo); outline-offset: 3px; }
+  a.btn.principal { background: var(--hueso); }
+  a.btn.segundo { background: var(--amarillo); }
+  .gano a.btn.principal { animation: pulsa .5s 2; }
+  @keyframes pulsa { 50% { transform: scale(1.05) rotate(-1deg); } }
+  footer { margin-top: 30px; text-align: center; font-size: 14px; color: #9AA0D1; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg class="picado" width="100%" height="58" aria-hidden="true">
+  <defs>
+    <symbol id="bandera" viewBox="0 0 60 46" width="60" height="46">
+      <path fill="currentColor" d="M0 0H60V36L50 46L40 36L30 46L20 36L10 46L0 36Z"/>
+      <circle cx="30" cy="15" r="6" fill="var(--anil)"/>
+      <circle cx="11" cy="11" r="2.6" fill="var(--anil)"/>
+      <circle cx="49" cy="11" r="2.6" fill="var(--anil)"/>
+      <path d="M30 24l4.5 4.5L30 33l-4.5-4.5z" fill="var(--anil)"/>
+    </symbol>
+    <pattern id="tira" width="300" height="58" patternUnits="userSpaceOnUse">
+      <use href="#bandera" x="0"   y="8" color="#C71A6C"/>
+      <use href="#bandera" x="60"  y="8" color="#F2B33D"/>
+      <use href="#bandera" x="120" y="8" color="#12877F"/>
+      <use href="#bandera" x="180" y="8" color="#C92F23"/>
+      <use href="#bandera" x="240" y="8" color="#1F8A5B"/>
+    </pattern>
+  </defs>
+  <rect x="0" y="0" width="100%" height="58" fill="url(#tira)"/>
+  <rect x="0" y="5" width="100%" height="3" fill="#F5E8CB"/>
+</svg>
+
+<main>
+  <header>
+    <h1>La lotería de mi cumpleaños</h1>
+    <p class="intro">Son nueve cartas y cada una trae un dato de la fiesta. Márcalas con un frijolito y, cuando las tengas todas, grita ¡Lotería!</p>
+  </header>
+
+  <section class="mesa" aria-label="El cumpleañero">
+    <div class="carta grande">
+      <span class="num" id="edad">17</span>
+      <span class="arte">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <ellipse class="fa" cx="100" cy="176" rx="78" ry="12"/>
+          <rect class="fro" x="40" y="112" width="120" height="62" rx="10"/>
+          <path class="fb" d="M40 122a10 10 0 0 1 10-10h100a10 10 0 0 1 10 10v6q-10 12-20 0q-10 8-20 0q-10 12-20 0q-10 8-20 0q-10 12-20 0q-10 8-20 0z"/>
+          <circle class="fa ns" cx="58" cy="152" r="3.5"/>
+          <circle class="ft ns" cx="82" cy="160" r="3.5"/>
+          <circle class="fa ns" cx="106" cy="150" r="3.5"/>
+          <circle class="ft ns" cx="130" cy="160" r="3.5"/>
+          <circle class="fa ns" cx="146" cy="148" r="3.5"/>
+          <rect class="ft" x="64" y="72" width="72" height="42" rx="8"/>
+          <path class="fb" d="M64 80a8 8 0 0 1 8-8h56a8 8 0 0 1 8 8v4q-9 10-18 0q-9 8-18 0q-9 10-18 0q-9 8-18 0z"/>
+          <rect class="fv" x="82" y="48" width="8" height="24" rx="2"/>
+          <rect class="fr" x="98" y="48" width="8" height="24" rx="2"/>
+          <rect class="fa" x="114" y="48" width="8" height="24" rx="2"/>
+          <path class="fa" d="M86 44c-8-8-2-14 0-22c2 8 8 14 0 22z"/>
+          <path class="fa" d="M86 44c-8-8-2-14 0-22c2 8 8 14 0 22z" transform="translate(16 0)"/>
+          <path class="fa" d="M86 44c-8-8-2-14 0-22c2 8 8 14 0 22z" transform="translate(32 0)"/>
+        </svg>
+      </span>
+      <span class="pie">
+        <span class="nombre">El Cumpleañero</span>
+        <span class="dato" id="quien">Alan</span>
+      </span>
+    </div>
+  </section>
+
+  <section aria-label="Tabla de lotería con los datos de la fiesta">
+    <div class="tabla" role="group">
+
+      <button type="button" class="carta" style="--c: var(--rojo)" aria-pressed="false">
+        <span class="num">1</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect class="fb" x="14" y="22" width="72" height="64" rx="7"/>
+            <path class="fr" d="M14 29a7 7 0 0 1 7-7h58a7 7 0 0 1 7 7v13H14z"/>
+            <path class="n" d="M32 14v16M68 14v16"/>
+            <circle class="fa" cx="50" cy="65" r="11"/>
+            <path class="n" d="M26 54h.1M74 54h.1M26 74h.1M74 74h.1" stroke-width="6"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">La Fecha</span><span class="dato" data-k="fecha"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--turquesa)" aria-pressed="false">
+        <span class="num">2</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="fro" cx="26" cy="24" r="12"/>
+            <circle class="fro" cx="74" cy="24" r="12"/>
+            <circle class="fb" cx="50" cy="55" r="33"/>
+            <path class="n" d="M50 35v21l14 9"/>
+            <path class="n" d="M30 90l-6 6M70 90l6 6"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">La Hora</span><span class="dato" data-k="hora"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--rosa)" aria-pressed="false">
+        <span class="num">3</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <ellipse class="fv" cx="50" cy="90" rx="28" ry="6"/>
+            <path class="fr" d="M50 86C30 62 24 52 24 40a26 26 0 0 1 52 0c0 12-6 22-26 46z"/>
+            <circle class="fb" cx="50" cy="40" r="10"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">El Lugar</span><span class="dato" data-k="lugar"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--verde)" aria-pressed="false">
+        <span class="num">4</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="fv" cx="30" cy="40" r="8"/>
+            <circle class="fr" cx="42" cy="28" r="8"/>
+            <circle class="fv" cx="57" cy="26" r="8"/>
+            <circle class="fr" cx="70" cy="37" r="8"/>
+            <path class="fa" d="M10 72a40 40 0 0 1 80 0z"/>
+            <path class="n" d="M22 72a28 28 0 0 1 56 0"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">La Comida</span><span class="dato" data-k="comida"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--rosa)" aria-pressed="false">
+        <span class="num">5</span>
+        <span class="arte sol"><b id="dias">14</b></span>
+        <span class="pie"><span class="nombre">La Cuenta</span><span class="dato" id="datoDias"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--rojo)" aria-pressed="false">
+        <span class="num">6</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <ellipse class="fro" cx="30" cy="76" rx="13" ry="10"/>
+            <ellipse class="ft" cx="70" cy="68" rx="13" ry="10"/>
+            <path class="n" d="M42 74V30M82 66V20"/>
+            <path class="fi" d="M42 30l40-10v13L42 43z"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">La Música</span><span class="dato" data-k="musica"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--turquesa)" aria-pressed="false">
+        <span class="num">7</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <path class="n" d="M50 20Q54 10 62 8"/>
+            <circle class="fr" cx="50" cy="26" r="8"/>
+            <path class="fa" d="M14 56v-8a8 8 0 0 1 8-8h56a8 8 0 0 1 8 8v8z"/>
+            <rect class="fb" x="14" y="56" width="72" height="12"/>
+            <rect class="fro" x="14" y="68" width="72" height="20" rx="3"/>
+            <path class="n" d="M8 92h84"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">El Pastel</span><span class="dato" data-k="pastel"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--verde)" aria-pressed="false">
+        <span class="num">8</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect class="fr" x="16" y="44" width="68" height="44" rx="4"/>
+            <rect class="fa" x="42" y="44" width="16" height="44"/>
+            <rect class="fro" x="12" y="32" width="76" height="16" rx="4"/>
+            <rect class="fa" x="42" y="32" width="16" height="16"/>
+            <path class="fa" d="M50 32C38 32 30 24 36 16c8-4 14 6 14 16z"/>
+            <path class="fa" d="M50 32c12 0 20-8 14-16-8-4-14 6-14 16z"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">El Regalo</span><span class="dato" data-k="regalo"></span></span>
+      </button>
+
+      <button type="button" class="carta" style="--c: var(--rojo)" aria-pressed="false">
+        <span class="num">9</span>
+        <span class="arte">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="fa" cx="34" cy="34" r="13"/>
+            <path class="fv" d="M10 88a24 24 0 0 1 48 0z"/>
+            <circle class="fro" cx="68" cy="40" r="11"/>
+            <path class="ft" d="M46 88a22 22 0 0 1 44 0z"/>
+          </svg>
+        </span>
+        <span class="pie"><span class="nombre">El Colado</span><span class="dato" data-k="colado"></span></span>
+      </button>
+
+    </div>
+    <p class="progreso" id="progreso" aria-live="polite">0 de 9 cartas marcadas</p>
+  </section>
+
+  <section class="tapete" aria-labelledby="tituloCta">
+    <h2 id="tituloCta">¿Te apuntas?</h2>
+    <p class="cuando" id="cuando"></p>
+    <address id="direccion"></address>
+    <div class="botones">
+      <a class="btn principal" id="btnWhats" target="_blank" rel="noopener">Confirmar por WhatsApp</a>
+      <a class="btn segundo" id="btnMapa" target="_blank" rel="noopener">Abrir en Google Maps</a>
+    </div>
+  </section>
+
+  <footer>Hecho a mano con HTML, CSS y un poco de JS.</footer>
+</main>
+
+<script>
+  const CFG = {
+    nombre: "Alan",
+    edad: 17,
+    fiesta: new Date(2026, 10, 7, 15, 0),
+    lugar: "Afuera de mi casa",
+    direccion: "Villas de la Estancia 102",
+    mapsUrl: "https://www.google.com/maps/place/Villas+de+la+Estancia+102/@20.5588647,-100.4996564,18.5z/data=!4m6!3m5!1s0x85d34e38a06cc373:0x859b565d61e88f39!8m2!3d20.558964!4d-100.500161!16s%2Fg%2F11c0rtz0s3?entry=ttu",
+    whatsapp: "5214427757136",
+    comida: "Carne asada",
+    musica: "Bocina y las rolas de todos",
+    pastel: "Sorpresa, nadie sabe cuándo",
+    regalo: "Tú ven y ya",
+    colado: "Se vale uno más"
+  };
+
+  const $ = (s) => document.querySelector(s);
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const F = CFG.fiesta;
+
+  const fechaCorta = cap(new Intl.DateTimeFormat("es-MX", { weekday: "short", day: "numeric", month: "short" }).format(F).replace(",", ""));
+  const fechaLarga = cap(new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "long" }).format(F));
+  const hora = new Intl.DateTimeFormat("es-MX", { hour: "numeric", minute: "2-digit", hour12: true }).format(F);
+
+  const datos = {
+    fecha: fechaCorta, hora: hora, lugar: CFG.lugar, comida: CFG.comida,
+    musica: CFG.musica, pastel: CFG.pastel, regalo: CFG.regalo, colado: CFG.colado
+  };
+  document.querySelectorAll("[data-k]").forEach((el) => { el.textContent = datos[el.dataset.k]; });
+
+  $("#quien").textContent = CFG.nombre;
+  $("#edad").textContent = CFG.edad;
+  $("#cuando").textContent = fechaLarga + ", " + hora;
+  $("#direccion").textContent = CFG.direccion;
+  $("#btnMapa").href = CFG.mapsUrl;
+  $("#btnWhats").href = "https://wa.me/" + CFG.whatsapp + "?text=" +
+    encodeURIComponent("¡Hola " + CFG.nombre + "! Confirmo que voy a tu cumple 🎉");
+
+  (function () {
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    const dia = new Date(F); dia.setHours(0, 0, 0, 0);
+    const d = Math.round((dia - hoy) / 864e5);
+    const num = $("#dias"), lbl = $("#datoDias");
+    if (d > 1)       { num.textContent = d; lbl.textContent = "días para la fiesta"; }
+    else if (d === 1) { num.textContent = 1; lbl.textContent = "día, es mañana"; }
+    else if (d === 0) { num.textContent = "Hoy"; lbl.textContent = "es la fiesta"; }
+    else              { num.textContent = "Ya"; lbl.textContent = "gracias por venir"; }
+  })();
+
+  const cartas = [...document.querySelectorAll("button.carta")];
+  const progreso = $("#progreso"), titulo = $("#tituloCta");
+
+  function actualiza() {
+    const n = cartas.filter((c) => c.getAttribute("aria-pressed") === "true").length;
+    if (n === cartas.length) {
+      progreso.textContent = "¡Lotería! Ya te sabes todo.";
+      titulo.textContent = "¡Lotería! Ahora confirma";
+      document.body.classList.add("gano");
+    } else {
+      progreso.textContent = n + " de " + cartas.length + " cartas marcadas";
+      titulo.textContent = "¿Te apuntas?";
+      document.body.classList.remove("gano");
+    }
+  }
+
+  cartas.forEach((c) => c.addEventListener("click", () => {
+    const marcada = c.getAttribute("aria-pressed") === "true";
+    if (marcada) {
+      c.setAttribute("aria-pressed", "false");
+      const b = c.querySelector(".frijol");
+      if (b) { b.classList.add("sale"); setTimeout(() => b.remove(), 200); }
+    } else {
+      c.setAttribute("aria-pressed", "true");
+      const b = document.createElement("i");
+      b.className = "frijol";
+      b.style.setProperty("--x", (24 + Math.random() * 30) + "%");
+      b.style.setProperty("--y", (22 + Math.random() * 26) + "%");
+      b.style.setProperty("--r", (Math.random() * 80 - 40) + "deg");
+      c.appendChild(b);
+    }
+    actualiza();
+  }));
+</script>
+</body>
+</html>
